@@ -1,0 +1,2 @@
+class TextMessagesController < ApplicationController
+end
