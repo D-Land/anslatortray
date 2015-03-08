@@ -29,6 +29,16 @@ class TextMessage < ActiveRecord::Base
   end
 
   def send_outgoing
-    puts body
+    client.messages.create(
+      to:   to,
+      from: from,
+      body: body
+    )
+  end
+
+  private
+
+  def client
+      @client ||= Twilio::REST::Client.new
   end
 end
