@@ -2,6 +2,33 @@ class TextMessage < ActiveRecord::Base
   after_create :process
 
   def process
+    if to == '+12345678910'
+      new_sentence = body.split.map{ |x| translate(x) }
+      new_sentence = new_sentence.join(" ")
+      TextMessage.create(to: from, from: '+12345678910', body: new_sentence)
+    else
+      send_outgoing
+    end
+  end
+
+  # From http://stackoverflow.com/a/13499011/4541669
+  def translate(str)
+    alpha = ('a'..'z').to_a
+    vowels = %w[a e i o u]
+    consonants = alpha - vowels
+
+    if vowels.include?(str[0])
+      str + 'ay'
+    elsif consonants.include?(str[0]) && consonants.include?(str[1])
+      str[2..-1] + str[0..1] + 'ay'
+    elsif consonants.include?(str[0])
+      str[1..-1] + str[0] + 'ay'
+    else
+      str
+    end
+  end
+
+  def send_outgoing
     puts body
   end
 end
