@@ -2,10 +2,10 @@ class TextMessage < ActiveRecord::Base
   after_create :process
 
   def process
-    if to == '+12345678910'
+    if to == phone_number
       new_sentence = body.split.map{ |x| translate(x) }
       new_sentence = new_sentence.join(" ")
-      TextMessage.create(to: from, from: '+12345678910', body: new_sentence)
+      TextMessage.create(to: from, from: phone_number, body: new_sentence)
     else
       send_outgoing
     end
@@ -37,6 +37,10 @@ class TextMessage < ActiveRecord::Base
   end
 
   private
+
+  def phone_number
+    @phone_number ||= Rails.application.secrets.twilio_phone_number
+  end
 
   def client
       @client ||= Twilio::REST::Client.new
